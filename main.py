@@ -1,5 +1,6 @@
 import json
 import sys
+import urllib.parse
 
 import lxml
 from bs4 import BeautifulSoup
@@ -34,10 +35,9 @@ WebDriverWait(driver, 10).until(
     EC.presence_of_element_located((By.CSS_SELECTOR, LATEST_INFO))
 )
 
-soup = BeautifulSoup(driver.page_source, 'lxml')
+entory = BeautifulSoup(driver.page_source, 'lxml').find_all('a')
 
-text = soup.find_all("h1")
-for title in text:
-    print(title.text)
+for i in [f'{a.get_text()}: {urllib.parse.urljoin(URL, a.get("href"))}' for a in entory]:
+    print(i)
 
 driver.close()
