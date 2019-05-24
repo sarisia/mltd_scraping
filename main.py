@@ -39,3 +39,5 @@ soup = BeautifulSoup(driver.page_source, 'lxml')
 text = soup.find_all("h1")
 for title in text:
     print(title.text)
+
+driver.close()
