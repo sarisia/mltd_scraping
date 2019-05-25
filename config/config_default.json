@@ -1,3 +1,5 @@
 {
-    "url": "http://example.com/"
+    "url": "http://example.com/",
+    "webhook": "http://example.com/",
+    "check_interbal": "300"
 }
