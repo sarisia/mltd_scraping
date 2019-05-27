@@ -21,14 +21,14 @@ with open('config/config.json', 'r') as f:
     conf = json.load(f)
     URL = conf.get('url')
     WEBHOOK_URL = conf.get('webhook')
-    CHECK_INTERBAL = int(conf.get('check_interbal'))
+    CHECK_INTERVAL = int(conf.get('check_interval'))
 
 if not URL or not WEBHOOK_URL:
     print('url is None')
     exit(1)
 
-if not CHECK_INTERBAL:
-    CHECK_INTERBAL = 300
+if not CHECK_INTERVAL:
+    CHECK_INTERVAL = 300
 
 op = Options()
 op.add_argument('--disable-gpu');
@@ -45,10 +45,10 @@ while True:
         EC.presence_of_element_located((By.CSS_SELECTOR, LATEST_INFO))
     )
 
-    entory = BeautifulSoup(driver.page_source, 'lxml').find('a')
-    title = entory.h1.get_text()
-    timestamp = entory.span.get_text()
-    shousai_url = urllib.parse.urljoin(URL, entory.get('href'))
+    entry = BeautifulSoup(driver.page_source, 'lxml').find('a')
+    title = entry.h1.get_text()
+    timestamp = entry.span.get_text()
+    shousai_url = urllib.parse.urljoin(URL, entry.get('href'))
     print(f'{title}: {timestamp}')
     if last_modified:
         if last_modified != timestamp:
@@ -57,7 +57,7 @@ while True:
                 print('post fail')
     last_modified = timestamp
     driver.close()
-    time.sleep(CHECK_INTERBAL)
+    time.sleep(CHECK_INTERVAL)
 
 def post_webhook(title, timestamp, shousai_url):
     payload = {
