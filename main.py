@@ -13,9 +13,23 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+def post_webhook(title, timestamp, shousai_url):
+    payload = {
+        'content': 'UPDATE!! '+timestamp,
+        'embeds': [{
+            'author': {
+                'name': '青羽美咲',
+                'icon_url': 'https://pbs.twimg.com/profile_images/1128990062274727936/Ij_DjSNo_400x400.png'
+            },
+            'title': title,
+            'description': 'Check [detail]('+shousai_url+')\nBy the way, [PLEASE FOLLOW ME.](https://twitter.com/imasml_theater)',
+            'color': 7656389
+        }]
+    }
+    return requests.post(WEBHOOK_URL, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
+
 LATEST_INFO = '#app > div > div > ul > a:nth-child(1) > li > section > h1'
 last_modified = ''
-
 
 with open('config/config.json', 'r') as f:
     conf = json.load(f)
@@ -53,23 +67,8 @@ while True:
     if last_modified:
         if last_modified != timestamp:
             res = post_webhook(title, timestamp, shousai_url)
-            if not res in [200, 201, 204]:
+            if not res.status_code in [200, 201, 204]:
                 print('post fail')
     last_modified = timestamp
     driver.close()
     time.sleep(CHECK_INTERVAL)
-
-def post_webhook(title, timestamp, shousai_url):
-    payload = {
-        'content': 'UPDATE!! '+timestamp,
-        'embeds': [{
-            'author': {
-                'name': '青羽美咲',
-                'icon_url': 'https://pbs.twimg.com/profile_images/1128990062274727936/Ij_DjSNo_400x400.png'
-            },
-            'title': title,
-            'description': 'Check [detail]('+shousai_url+')\nBy the way, [PLEASE FOLLOW ME.](https://twitter.com/imasml_theater)',
-            'color': 7656389
-        }]
-    }
-    return requests.post(WEBHOOK_URL, headers={'Content-Type': 'application/json'}, data=json.dumps(payload))
