@@ -57,7 +57,7 @@ op.add_argument('--proxy-bypass-list=*');
 op.add_argument('--start-maximized');
 op.add_argument('--headless');
 
-async def doit():
+def doit():
     global last_modified
     driver = webdriver.Chrome(options=op)
     driver.get(URL)
@@ -84,3 +84,4 @@ async def schedule():
     loop.create_task(schedule())
 
 loop.create_task(schedule())
+loop.run_forever()
