@@ -2,6 +2,8 @@ import json
 import sys
 import time
 import urllib.parse
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 import lxml
 import requests
@@ -12,6 +14,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+loop = asyncio.get_event_loop()
+pool = ThreadPoolExecutor(max_workers=3)
 
 def post_webhook(title, timestamp, shousai_url):
     payload = {
@@ -52,7 +57,8 @@ op.add_argument('--proxy-bypass-list=*');
 op.add_argument('--start-maximized');
 op.add_argument('--headless');
 
-while True:
+async def doit():
+    global last_modified
     driver = webdriver.Chrome(options=op)
     driver.get(URL)
     WebDriverWait(driver, 10).until(
@@ -71,4 +77,10 @@ while True:
                 print('post fail')
     last_modified = timestamp
     driver.close()
-    time.sleep(CHECK_INTERVAL)
+
+async def schedule():
+    await asyncio.sleep(1)
+    loop.run_in_executor(pool, doit)
+    loop.create_task(schedule())
+
+loop.create_task(schedule())
